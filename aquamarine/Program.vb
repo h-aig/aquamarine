@@ -19,10 +19,17 @@ Module Program
             Catch ex as Exception ' if the url is incorrect
                 rawRSS = "There was an exception!" ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
             End try
-        prettyRSS.load(rawRSS)
+        prettyRSS.loadxml(rawRSS)
         
+        dim item as XmlNode
         Dim nodeList as XmlNodeList 
         Dim root as XmlNode = prettyRSS.DocumentElement
+        
+        nodeList=root.SelectNodes("/rss/channel/item")
+        
+        for each item in nodeList      
+            Console.WriteLine("cheese")
+        next 
         
         Console.ReadLine()
     End Sub

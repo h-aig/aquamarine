@@ -5,6 +5,7 @@ Imports System.Net.Http
 Imports System.Net.Http.Headers
 Imports System.Net.Mime
 Imports System.Xml
+Imports ReadSharp
 
 Module Program
     Sub Main(args As String())
@@ -85,22 +86,10 @@ Module Program
     End Sub
     
     sub testSub
-            dim ContentType as new MediaTypeHeaderValue("application/json")
-            dim client = new HttpClient()
-            dim request = new HttpRequestMessage
-            dim Method = HttpMethod.Post,
-                RequestUri = new Uri("https://www.theverge.com/policy/902284/cuba-aid-convoy-phones-seized-cbp-nuestra-america"),
-                Headers =
-                {
-                    { "x-rapidapi-host", "full-text-rss.p.rapidapi.com" }
-                }
+        Dim reader As New Reader()
+        Dim article = reader.Read(New Uri("https://example.com"))
         
-        dim response = client.send(request)
-        dim Content = new StringContent("{}")
-            response.EnsureSuccessStatusCode()
         
-        dim body = response.Content.ReadAsStringAsync()
-        Console.WriteLine(body)
         
         Console.ReadLine()
     End sub

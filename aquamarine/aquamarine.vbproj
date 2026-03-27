@@ -6,4 +6,8 @@
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="ReadSharp" Version="6.3.0" />
+    </ItemGroup>
+
 </Project>

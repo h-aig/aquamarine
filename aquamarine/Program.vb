@@ -1,10 +1,14 @@
 ' (<3 dotnetperls, https://www.dotnetperls.com/webclient-vbnet)
 Imports System
 Imports System.Net
+Imports System.Net.Http
+Imports System.Net.Http.Headers
+Imports System.Net.Mime
 Imports System.Xml
 
 Module Program
     Sub Main(args As String())
+        testSub()
         Console.Clear() ' get rid of the accursed yellow boot text in rider-- no effect in prod
         Console.ForegroundColor = ConsoleColor.White
         dim rssList(0) as String ' stores list of all rss posts
@@ -17,7 +21,7 @@ Module Program
         Console.WriteLine()
         
         try
-        rawRSS = client.DownloadString("https://feeds.bbci.co.uk/news/england/rss.xml") ' Download data as string
+        rawRSS = client.DownloadString("https://feeds.arstechnica.com/arstechnica/index.xml") ' Download data as string
             Catch ex as Exception ' if the url is incorrect
                 rawRSS = "There was an exception!" ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
             End try
@@ -79,5 +83,26 @@ Module Program
         
         Console.ReadLine()
     End Sub
+    
+    sub testSub
+            dim ContentType as new MediaTypeHeaderValue("application/json")
+            dim client = new HttpClient()
+            dim request = new HttpRequestMessage
+            dim Method = HttpMethod.Post,
+                RequestUri = new Uri("https://www.theverge.com/policy/902284/cuba-aid-convoy-phones-seized-cbp-nuestra-america"),
+                Headers =
+                {
+                    { "x-rapidapi-host", "full-text-rss.p.rapidapi.com" }
+                }
+        
+        dim response = client.send(request)
+        dim Content = new StringContent("{}")
+            response.EnsureSuccessStatusCode()
+        
+        dim body = response.Content.ReadAsStringAsync()
+        Console.WriteLine(body)
+        
+        Console.ReadLine()
+    End sub
     
 End Module

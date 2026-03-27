@@ -87,8 +87,7 @@ Module Program
     
     sub testSub
         Dim reader As New Reader()
-        Dim article = reader.Read(New Uri("https://example.com"))
-        
+        Dim article = reader.Read(New Uri("https://theverge.com"))
         
         
         Console.ReadLine()

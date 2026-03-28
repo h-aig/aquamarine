@@ -94,14 +94,13 @@ Module Program
     
     sub testSub()
         
-        dim article as SmartReader.article = SmartReader.Reader.ParseArticle("https://www.bbc.co.uk/news/articles/c62lx8ek9x9o")
+        dim article as SmartReader.article = SmartReader.Reader.ParseArticle("https://www.theverge.com/ai-artificial-intelligence/902368/openai-sora-dead-ai-video-generation-competition")
         dim rawContent as string = article.Content
         dim prettyParagraphs(0)
         dim endOfParagraph as boolean
         dim currentParagraph as integer
         dim startParagraphAfter as Integer
-        
-        Console.WriteLine(rawContent.Substring(0, 1))
+        dim ignoreChars as boolean = False
         
         for i as integer = 0 to rawContent.Length - 1
             
@@ -125,8 +124,16 @@ Module Program
                 End If
             End If
             
-            if i > startParagraphAfter And  endOfParagraph = False
+            if rawcontent.Substring(i, 1) = "<"
+                ignoreChars = True
+            End If
+            
+            if i > startParagraphAfter And  endOfParagraph = False and ignoreChars = False
                 prettyParagraphs(currentParagraph) = prettyParagraphs(currentParagraph) & rawContent.Substring(i, 1)
+            End If
+            
+            if rawContent.Substring(i, 1)= ">"
+                ignoreChars = False
             End If
             
         Next

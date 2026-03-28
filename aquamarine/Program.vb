@@ -4,16 +4,13 @@ Imports System.Net
 Imports System.Net.Http
 Imports System.Net.Http.Headers
 Imports System.Net.Mime
+Imports System.Runtime.Intrinsics.X86
 Imports System.Xml
 Imports AngleSharp.Html.Dom
 Imports NReadability
 Imports ReadSharp
 
 Module Program
-    
-    Public NotInheritable Class HtmlDocument
-        
-    End Class
     
     Sub Main(args As String())
         testSub()
@@ -93,18 +90,21 @@ Module Program
     End Sub
     
     sub testSub()
+        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.bbc.com/news/articles/cwywxlvelevo?at_medium=RSS&at_campaign=rss")
         
-        dim article as SmartReader.article = SmartReader.Reader.ParseArticle("https://www.theverge.com/ai-artificial-intelligence/902368/openai-sora-dead-ai-video-generation-competition")
+        dim article as SmartReader.article = sr.GetArticle()
         dim rawContent as string = article.Content
         dim prettyParagraphs(0)
         dim endOfParagraph as boolean
-        dim currentParagraph as integer
+        dim currentParagraphNum as integer
         dim startParagraphAfter as Integer
         dim ignoreChars as boolean = False
+        dim shouldWriteParagraph as Boolean = True
+        Dim paragraphLength as Integer
         
         for i as integer = 0 to rawContent.Length - 1
             
-            currentParagraph = prettyParagraphs.Length - 1
+            currentParagraphNum = prettyParagraphs.Length - 1
             
             if rawContent.Substring(i, 1) = "<"
                 if rawContent.Substring(i+1, 1) = "p"
@@ -129,19 +129,30 @@ Module Program
             End If
             
             if i > startParagraphAfter And  endOfParagraph = False and ignoreChars = False
-                prettyParagraphs(currentParagraph) = prettyParagraphs(currentParagraph) & rawContent.Substring(i, 1)
+                prettyParagraphs(currentParagraphNum) = prettyParagraphs(currentParagraphNum) & rawContent.Substring(i, 1)
             End If
             
             if rawContent.Substring(i, 1)= ">"
                 ignoreChars = False
             End If
-            
         Next
         
-        
-        for i as integer = 0 to prettyParagraphs.Length - 1
+        for i as integer = 0 to prettyParagraphs.Length - 2
+            shouldWriteParagraph = True
+            
+            Try
+                paragraphLength = prettyParagraphs(i).ToString().Length
+                Catch
+                    shouldWriteParagraph = False
+            End Try
+            
+            if shouldWriteParagraph = True
             Console.WriteLine(prettyParagraphs(i))
-            Console.WriteLine()
+                if not i = prettyParagraphs.Length - 2 
+                    Console.WriteLine()
+                End If
+            End If
+
         Next
         
         Console.ReadLine()

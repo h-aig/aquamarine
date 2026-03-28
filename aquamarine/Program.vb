@@ -90,10 +90,11 @@ Module Program
     End Sub
     
     sub testSub()
-        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.bbc.com/news/articles/cwywxlvelevo?at_medium=RSS&at_campaign=rss")
+        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.nytimes.com/live/2026/03/28/world/iran-war-trump-israel-oil")
         
         dim article as SmartReader.article = sr.GetArticle()
         dim rawContent as string = article.Content
+        
         dim prettyParagraphs(0)
         dim endOfParagraph as boolean
         dim currentParagraphNum as integer
@@ -101,6 +102,8 @@ Module Program
         dim ignoreChars as boolean = False
         dim shouldWriteParagraph as Boolean = True
         Dim paragraphLength as Integer
+        
+    if article.IsReadable = True
         
         for i as integer = 0 to rawContent.Length - 1
             
@@ -141,6 +144,9 @@ Module Program
         
         for i as integer = 0 to prettyParagraphs.Length - 2
             shouldWriteParagraph = True
+            if article.SiteName = "BBC News" and i = 0
+                shouldWriteParagraph = False
+            End If
             
             Try
                 paragraphLength = prettyParagraphs(i).ToString().Length
@@ -154,8 +160,11 @@ Module Program
                     Console.WriteLine()
                 End If
             End If
-
         Next
+        
+        Else 
+            Console.WriteLine("Content paywalled or otherwise unaccessible.")
+    End If
         
         Console.ReadLine()
     End sub

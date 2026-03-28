@@ -26,10 +26,10 @@ Module Program
         Console.WriteLine()
         
         try
-        rawRSS = client.DownloadString("https://feeds.arstechnica.com/arstechnica/index.xml") ' Download data as string
-            Catch ex as Exception ' if the url is incorrect
-                rawRSS = "There was an exception!" ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
-            End try
+            rawRSS = client.DownloadString("https://feeds.arstechnica.com/arstechnica/index.xml") ' Download data as string
+        Catch ex as Exception ' if the url is incorrect
+            rawRSS = "There was an exception!" ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
+        End try
         xmlRSS.loadxml(rawRSS) ' take string downloaded and store in xmldocument variable xmlRSS
         
         dim item as XmlNode
@@ -90,7 +90,7 @@ Module Program
     End Sub
     
     sub testSub()
-        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.nytimes.com/live/2026/03/28/world/iran-war-trump-israel-oil")
+        dim sr as SmartReader.Reader = new smartreader.Reader("https://simonwillison.net/2026/Mar/27/vibe-coding-swiftui/#atom-everything")
         
         dim article as SmartReader.article = sr.GetArticle()
         dim rawContent as string = article.Content
@@ -103,68 +103,66 @@ Module Program
         dim shouldWriteParagraph as Boolean = True
         Dim paragraphLength as Integer
         
-    if article.IsReadable = True
+        if article.IsReadable = True
         
-        for i as integer = 0 to rawContent.Length - 1
+            for i as integer = 0 to rawContent.Length - 1
             
-            currentParagraphNum = prettyParagraphs.Length - 1
+                currentParagraphNum = prettyParagraphs.Length - 1
             
-            if rawContent.Substring(i, 1) = "<"
-                if rawContent.Substring(i+1, 1) = "p"
-                    if rawContent.Substring(i+2, 1) = ">" and not rawContent.Substring(i+3, 1) = "<"
-                        endOfParagraph = False
-                        startParagraphAfter = i+2
+                if rawContent.Substring(i, 1) = "<"
+                    if rawContent.Substring(i+1, 1) = "p"
+                        if rawContent.Substring(i+2, 1) = ">" and not rawContent.Substring(i+3, 1) = "<"
+                            endOfParagraph = False
+                            startParagraphAfter = i+2
+                        End If
                     End If
-                End If
                 
-                If rawContent.Substring(i+1, 1) = "/"
-                    if rawContent.Substring(i+2, 1) = "p"
-                        if rawContent.Substring(i+3, 1) = ">"
-                            endOfParagraph = True
-                            Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1)
+                    If rawContent.Substring(i+1, 1) = "/"
+                        if rawContent.Substring(i+2, 1) = "p"
+                            if rawContent.Substring(i+3, 1) = ">"
+                                endOfParagraph = True
+                                Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1)
+                            End If
                         End If
                     End If
                 End If
-            End If
             
-            if rawcontent.Substring(i, 1) = "<"
-                ignoreChars = True
-            End If
+                if rawcontent.Substring(i, 1) = "<"
+                    ignoreChars = True
+                End If
             
-            if i > startParagraphAfter And  endOfParagraph = False and ignoreChars = False
-                prettyParagraphs(currentParagraphNum) = prettyParagraphs(currentParagraphNum) & rawContent.Substring(i, 1)
-            End If
+                if i > startParagraphAfter And  endOfParagraph = False and ignoreChars = False
+                    prettyParagraphs(currentParagraphNum) = prettyParagraphs(currentParagraphNum) & rawContent.Substring(i, 1)
+                End If
             
-            if rawContent.Substring(i, 1)= ">"
-                ignoreChars = False
-            End If
-        Next
-        
-'        Console.WriteLine(article.Content)
-        
-        for i as integer = 0 to prettyParagraphs.Length - 2
-            shouldWriteParagraph = True
-            if article.SiteName = "BBC News" and i = 0
-                shouldWriteParagraph = False
-            End If
+                if rawContent.Substring(i, 1)= ">"
+                    ignoreChars = False
+                End If
+            Next
             
-            Try
-                paragraphLength = prettyParagraphs(i).ToString().Length
+            for i as integer = 0 to prettyParagraphs.Length - 2
+                shouldWriteParagraph = True
+                if article.SiteName = "BBC News" and i = 0
+                    shouldWriteParagraph = False
+                End If
+            
+                Try
+                    paragraphLength = prettyParagraphs(i).ToString().Length
                 Catch
                     shouldWriteParagraph = False
-            End Try
+                End Try
             
-            if shouldWriteParagraph = True
-            Console.WriteLine(prettyParagraphs(i))
-                if not i = prettyParagraphs.Length - 2 
-                    Console.WriteLine()
+                if shouldWriteParagraph = True
+                    Console.WriteLine(prettyParagraphs(i))
+                    if not i = prettyParagraphs.Length - 2 
+                        Console.WriteLine()
+                    End If
                 End If
-            End If
-        Next
+            Next
         
         Else 
             Console.WriteLine("Content paywalled or otherwise unaccessible.")
-    End If
+        End If
         
         Console.ReadLine()
     End sub

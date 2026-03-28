@@ -108,7 +108,7 @@ Module Program
             
             if rawContent.Substring(i, 1) = "<"
                 if rawContent.Substring(i+1, 1) = "p"
-                    if rawContent.Substring(i+2, 1) = ">"
+                    if rawContent.Substring(i+2, 1) = ">" and not rawContent.Substring(i+3, 1) = "<"
                         endOfParagraph = False
                         startParagraphAfter = i+2
                     End If
@@ -136,6 +136,8 @@ Module Program
                 ignoreChars = False
             End If
         Next
+        
+'        Console.WriteLine(article.Content)
         
         for i as integer = 0 to prettyParagraphs.Length - 2
             shouldWriteParagraph = True

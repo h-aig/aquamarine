@@ -5,6 +5,7 @@ Imports System.Net.Http
 Imports System.Net.Http.Headers
 Imports System.Net.Mime
 Imports System.Xml
+Imports NReadability
 Imports ReadSharp
 
 Module Program
@@ -84,13 +85,15 @@ Module Program
         
         Console.ReadLine()
     End Sub
-    
-    sub testSub
-        Dim reader As New Reader()
-        Dim article = reader.Read(New Uri("https://theverge.com"))
-        
+    sub testSub()
+        dim article as SmartReader.Article = SmartReader.Reader.ParseArticle("https://arstechnica.com/gaming/2026/03/playing-wolfenstein-3d-with-one-hand-in-2026/")
+        if(article.IsReadable)
+            Console.WriteLine(article.Content)
+        End If
         
         Console.ReadLine()
     End sub
     
+    
+
 End Module

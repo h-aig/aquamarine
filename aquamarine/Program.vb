@@ -5,10 +5,16 @@ Imports System.Net.Http
 Imports System.Net.Http.Headers
 Imports System.Net.Mime
 Imports System.Xml
+Imports AngleSharp.Html.Dom
 Imports NReadability
 Imports ReadSharp
 
 Module Program
+    
+    Public NotInheritable Class HtmlDocument
+        
+    End Class
+    
     Sub Main(args As String())
         testSub()
         Console.Clear() ' get rid of the accursed yellow boot text in rider-- no effect in prod
@@ -85,15 +91,52 @@ Module Program
         
         Console.ReadLine()
     End Sub
+    
     sub testSub()
-        dim article as SmartReader.Article = SmartReader.Reader.ParseArticle("https://arstechnica.com/gaming/2026/03/playing-wolfenstein-3d-with-one-hand-in-2026/")
-        if(article.IsReadable)
-            Console.WriteLine(article.Content)
-        End If
+        
+        dim article as SmartReader.article = SmartReader.Reader.ParseArticle("https://www.bbc.co.uk/news/articles/c62lx8ek9x9o")
+        dim rawContent as string = article.Content
+        dim prettyParagraphs(0)
+        dim endOfParagraph as boolean
+        dim currentParagraph as integer
+        dim startParagraphAfter as Integer
+        
+        Console.WriteLine(rawContent.Substring(0, 1))
+        
+        for i as integer = 0 to rawContent.Length - 1
+            
+            currentParagraph = prettyParagraphs.Length - 1
+            
+            if rawContent.Substring(i, 1) = "<"
+                if rawContent.Substring(i+1, 1) = "p"
+                    if rawContent.Substring(i+2, 1) = ">"
+                        endOfParagraph = False
+                        startParagraphAfter = i+2
+                    End If
+                End If
+                
+                If rawContent.Substring(i+1, 1) = "/"
+                    if rawContent.Substring(i+2, 1) = "p"
+                        if rawContent.Substring(i+3, 1) = ">"
+                            endOfParagraph = True
+                            Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1)
+                        End If
+                    End If
+                End If
+            End If
+            
+            if i > startParagraphAfter And  endOfParagraph = False
+                prettyParagraphs(currentParagraph) = prettyParagraphs(currentParagraph) & rawContent.Substring(i, 1)
+            End If
+            
+        Next
+        
+        
+        for i as integer = 0 to prettyParagraphs.Length - 1
+            Console.WriteLine(prettyParagraphs(i))
+            Console.WriteLine()
+        Next
         
         Console.ReadLine()
     End sub
-    
-    
-
 End Module

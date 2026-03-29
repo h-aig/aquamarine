@@ -90,75 +90,77 @@ Module Program
     End Sub
     
     sub testSub()
-        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.w3schools.io/xml-escape-characters/")
+        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.w3schools.io/xml-escape-characters/") ' article to download
         
-        dim article as SmartReader.article = sr.GetArticle()
-        dim rawContent as string = article.Content
-        rawContent = rawContent.Replace("&amp;", "&")
-        rawContent = rawContent.Replace("&lt;", "<")
-        rawContent = rawContent.Replace("&gt;", ">")
+        dim article as SmartReader.article = sr.GetArticle() ' download article
+        dim rawContent as string = article.Content ' article stored in a variable as a string to manipulate
         
-        dim prettyParagraphs(0)
-        dim endOfParagraph as boolean
-        dim currentParagraphNum as integer
-        dim startParagraphAfter as Integer
-        dim ignoreChars as boolean = False
-        dim shouldWriteParagraph as Boolean = True
-        Dim paragraphLength as Integer
+        dim prettyParagraphs(0) ' to store paragraphs
+        dim endOfParagraph as boolean ' used to indicate the end of a paragraph
+        dim currentParagraphNum as integer ' stores current paragraph number
+        dim startParagraphAfter as Integer ' after this character number, start writing the paragraph
+        dim ignoreChars as boolean = False ' ignore intra-paragraph tags containing things such as images
+        dim shouldWriteParagraph as Boolean = True ' write the paragraph, unless it's empty
+        Dim paragraphLength as Integer ' used to determine whether the paragraph is empty, and thus shouldWriteParagraph status
         
         if article.IsReadable = True
         
-            for i as integer = 0 to rawContent.Length - 1
+            for i as integer = 0 to rawContent.Length - 1 ' for all the characters in the raw article content
             
-                currentParagraphNum = prettyParagraphs.Length - 1
+                currentParagraphNum = prettyParagraphs.Length - 1 ' because prettyParagraphs starts at 0, the length would be 1 at 0 if you get me, so need to subtract 1
             
-                if rawContent.Substring(i, 1) = "<"
-                    if rawContent.Substring(i+1, 2) = "p>"  and not rawContent.Substring(i+3, 1) = "<"
-                        endOfParagraph = False
-                        startParagraphAfter = i+2
+                if rawContent.Substring(i, 1) = "<" ' if the opening of a tag is detected...
+                    if rawContent.Substring(i+1, 2) = "p>"  and not rawContent.Substring(i+3, 1) = "<" ' if the rest of the tag is p>, and there are no tags immediately inside...
+                        endOfParagraph = False ' it is no longer the end of the paragraph
+                        startParagraphAfter = i+2 'start paragraph after i+2, which is > in a <p> tag, considering i would be <
                     End If
                 
-                    If rawContent.Substring(i+1, 3) = "/p>" 
-                        endOfParagraph = True
-                        Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1)
+                    If rawContent.Substring(i+1, 3) = "/p>" ' if the closing of a tag is detected...
+                        endOfParagraph = True ' it is the end of a paragraph
+                        Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1) ' increase the size of the array by 1 to accomodate another paragraph
                     End If
                 End If
             
-                if rawcontent.Substring(i, 1) = "<"
-                    ignoreChars = True
+                if rawcontent.Substring(i, 1) = "<" ' if, intra-paragraph, the start of a tag is detected...
+                    ignoreChars = True ' ignore characters until the end of the tag
                 End If
             
-                if i > startParagraphAfter And  endOfParagraph = False and ignoreChars = False
-                    prettyParagraphs(currentParagraphNum) = prettyParagraphs(currentParagraphNum) & rawContent.Substring(i, 1)
+                if i > startParagraphAfter And  endOfParagraph = False and ignoreChars = False ' if the beginning of the tag has ended, and it's not the end of a paragraph, and it's not an intra <p> tag..
+                    prettyParagraphs(currentParagraphNum) = prettyParagraphs(currentParagraphNum) & rawContent.Substring(i, 1) ' add the next character to the current paragraph
                 End If
             
                 if rawContent.Substring(i, 1)= ">"
-                    ignoreChars = False
+                    ignoreChars = False ' if the end of a tag is detected, stop ignoring characters
                 End If
             Next
             
             for i as integer = 0 to prettyParagraphs.Length - 2
+                prettyParagraphs(i) = prettyParagraphs(i).Replace("&amp;", "&") 
+                prettyParagraphs(i) = prettyParagraphs(i).Replace("&lt;", "<") ' replace escape sequences with correct characters in each paragraph
+                prettyParagraphs(i) = prettyParagraphs(i).Replace("&gt;", ">")
+                
+                
                 shouldWriteParagraph = True
-                if article.SiteName = "BBC News" and i = 0
+                if article.SiteName = "BBC News" and i = 0 ' BBC News edge case
                     shouldWriteParagraph = False
                 End If
             
-                Try
+                Try ' to determine whether a paragraph is empty, try to find its length
                     paragraphLength = prettyParagraphs(i).ToString().Length
-                Catch
+                Catch ' if an exception throws, don't write the paragraph by changing the variable
                     shouldWriteParagraph = False
                 End Try
             
-                if shouldWriteParagraph = True
+                if shouldWriteParagraph = True ' if the paragraph isn't empty
                     Console.WriteLine(prettyParagraphs(i))
                     if not i = prettyParagraphs.Length - 2 
-                        Console.WriteLine()
+                        Console.WriteLine() ' if it's not the end, line break
                     End If
                 End If
             Next
         
         Else 
-            Console.WriteLine("Content paywalled or otherwise unaccessible.")
+            Console.WriteLine("Content paywalled or otherwise unaccessible.") ' < if content isn't readable
         End If
         
         Console.ReadLine()

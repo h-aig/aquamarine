@@ -29,7 +29,7 @@ Module Program
         Console.WriteLine()
         
         Try
-        Using reader as XmlReader = XmlReader.Create("https://www.theverge.com/rss/index.xml")  ' ' Download data, should ask user
+        Using reader as XmlReader = XmlReader.Create("https://feeds.arstechnica.com/arstechnica/index")  ' ' Download data, should ask user
             synFeed = SyndicationFeed.Load(reader)
         End Using
         
@@ -177,6 +177,7 @@ Module Program
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&amp;", "&") 
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&lt;", "<") ' replace escape sequences with correct characters in each paragraph
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&gt;", ">")
+                    prettyParagraphs(i) = prettyParagraphs(i).replace("&nbsp;", " ")
                     
                     Console.WriteLine(prettyParagraphs(i))
                     if not i = prettyParagraphs.Length - 2 

@@ -90,10 +90,13 @@ Module Program
     End Sub
     
     sub testSub()
-        dim sr as SmartReader.Reader = new smartreader.Reader("https://simonwillison.net/2026/Mar/27/vibe-coding-swiftui/#atom-everything")
+        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.w3schools.io/xml-escape-characters/")
         
         dim article as SmartReader.article = sr.GetArticle()
         dim rawContent as string = article.Content
+        rawContent = rawContent.Replace("&amp;", "&")
+        rawContent = rawContent.Replace("&lt;", "<")
+        rawContent = rawContent.Replace("&gt;", ">")
         
         dim prettyParagraphs(0)
         dim endOfParagraph as boolean
@@ -110,20 +113,14 @@ Module Program
                 currentParagraphNum = prettyParagraphs.Length - 1
             
                 if rawContent.Substring(i, 1) = "<"
-                    if rawContent.Substring(i+1, 1) = "p"
-                        if rawContent.Substring(i+2, 1) = ">" and not rawContent.Substring(i+3, 1) = "<"
-                            endOfParagraph = False
-                            startParagraphAfter = i+2
-                        End If
+                    if rawContent.Substring(i+1, 2) = "p>"  and not rawContent.Substring(i+3, 1) = "<"
+                        endOfParagraph = False
+                        startParagraphAfter = i+2
                     End If
                 
-                    If rawContent.Substring(i+1, 1) = "/"
-                        if rawContent.Substring(i+2, 1) = "p"
-                            if rawContent.Substring(i+3, 1) = ">"
-                                endOfParagraph = True
-                                Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1)
-                            End If
-                        End If
+                    If rawContent.Substring(i+1, 3) = "/p>" 
+                        endOfParagraph = True
+                        Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1)
                     End If
                 End If
             

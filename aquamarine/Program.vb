@@ -1,4 +1,4 @@
-' (<3 dotnetperls, https://www.dotnetperls.com/webclient-vbnet)
+' (thanks dotnetperls! https://www.dotnetperls.com/webclient-vbnet)
 Imports System
 Imports System.Net
 Imports System.Net.Http
@@ -7,53 +7,75 @@ Imports System.Net.Mime
 Imports System.Runtime.Intrinsics.X86
 Imports System.Xml
 Imports AngleSharp.Html.Dom
-Imports NReadability
-Imports ReadSharp
+Imports System.ServiceModel.Syndication
+Imports System.Text
 
 Module Program
     
     Sub Main(args As String())
-        testSub()
+        
         Console.Clear() ' get rid of the accursed yellow boot text in rider-- no effect in prod
         Console.ForegroundColor = ConsoleColor.White
-        dim rssList(0) as String ' stores list of all rss posts
+        dim rssTitleList(0) as String ' stores list of all rss posts
+        dim rssLinkList(0) as String ' stores list of all rss links
         dim client as new WebClient ' client
         Dim rawRSS As string ' this stores the downloaded string
         dim xmlRSS as new xmldocument() ' this holds the downloaded string as an xmldocument
+        dim synFeed as SyndicationFeed
+        dim sb as new StringBuilder()
         client.Headers("User-Agent") = "Mozilla/4.0" ' Set one of the headers.   
         
         Console.WriteLine("Aquamarine. A new way to consume information.")
         Console.WriteLine()
         
-        try
-            rawRSS = client.DownloadString("https://feeds.arstechnica.com/arstechnica/index.xml") ' Download data as string
-        Catch ex as Exception ' if the url is incorrect
-            rawRSS = "There was an exception!" ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
-        End try
-        xmlRSS.loadxml(rawRSS) ' take string downloaded and store in xmldocument variable xmlRSS
+        Try
+        Using reader as XmlReader = XmlReader.Create("https://www.theverge.com/rss/index.xml")  ' ' Download data, should ask user
+            synFeed = SyndicationFeed.Load(reader)
+        End Using
+        
+        Using writer as XmlWriter = XmlWriter.Create(sb)
+        synFeed.SaveAsRss20(writer)
+        End Using
+        Catch
+            rawRSS = "There was an exception!"  ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
+            End Try
+        
+        xmlRSS.LoadXml(sb.ToString())
+        
+'        try
+'            rawRSS = client.DownloadString("https://rss.app/feeds/daGiDlOdecTa06Vb.xml") ' Download data as string, should ask user
+'        Catch ex as Exception ' if the url is incorrect
+'            rawRSS = "There was an exception!" ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
+'        End try
+'        xmlRSS.loadxml(rawRSS) ' take string downloaded and store in xmldocument variable xmlRSS
         
         dim item as XmlNode
         Dim nodeList as XmlNodeList ' i need a try here-- if the xml is invalid
         Dim root as XmlNode = xmlRSS.DocumentElement
-        nodeList=root.SelectNodes("/rss/channel/item")
+        nodeList=root.SelectNodes("//*[local-name()='entry' or local-name()='item']")
         
         for each item in nodeList ' for each post in the feed...
-            dim title as XmlNode = item.SelectSingleNode("title") ' find post
-            rssList(rssList.Length-1) = title.InnerText ' place post in rssList
-            Array.Resize(rssList, rssList.Length+1) ' increase size of array by 1
+            dim title as XmlNode = item.SelectSingleNode("title") ' find title
+            dim link as XmlNode = item.SelectSingleNode("link") ' find link
+            rssTitleList(rssTitleList.Length-1) = title.InnerText ' place post in list
+            rssLinkList(rssLinkList.Length-1) = link.InnerText ' 
+            Array.Resize(rssTitleList, rssTitleList.Length+1) ' increase size of array by 1
+            Array.Resize(rssLinkList, rssLinkList.Length+1) 
         next 
-        Array.resize(rssList, rsslist.length-1) ' get rid of empty string at the end
-        for i as integer = 0 to rssList.Length-1
-            console.WriteLine(rssList(i))
+        Array.resize(rssTitleList, rssTitleList.length-1) ' get rid of empty string at the end
+        Array.resize(rssLinkList, rssLinkList.length-1) 
+        
+        for i as integer = 0 to rssTitleList.Length-1
+            console.WriteLine(rssTitleList(i))
         Next
         
         Console.SetCursorPosition(0,2)
         Console.BackgroundColor = ConsoleColor.White
         Console.ForegroundColor = ConsoleColor.Black
-        Console.Write(rssList(0))
+        Console.Write(rssTitleList(0))
             
         While True
-            Dim key As ConsoleKeyInfo = Console.ReadKey(True) ' True = don't display
+            Dim key As ConsoleKeyInfo = Console.ReadKey(True) ' True = don't display inputted characters
             Select Case key.Key ' Merge all keys into one Case -- https://chatgpt.com/s/t_69ac323c5adc8191ac526fa15f7b7065
                 Case ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.Enter
                     ' Handle each key individually
@@ -62,25 +84,25 @@ Module Program
                             console.cursorleft = 0
                             Console.BackgroundColor = ConsoleColor.Black
                             Console.ForegroundColor = ConsoleColor.white
-                            Console.Write(rssList(Console.CursorTop - 2))
+                            Console.Write(rssTitleList(Console.CursorTop - 2))
                             console.SetCursorPosition(0, console.CursorTop - 1)
                             Console.BackgroundColor = ConsoleColor.White
                             Console.ForegroundColor = ConsoleColor.Black
-                            Console.Write(rssList(Console.CursorTop - 2))
+                            Console.Write(rssTitleList(Console.CursorTop - 2))
                         End If
                     ElseIf key.Key = ConsoleKey.DownArrow Then
-                        if not Console.CursorTop = rssList.Length + 1 'array starts at 0, so it's +1 and not +2 in terms of boundary checking
+                        if not Console.CursorTop = rssTitleList.Length + 1 'array starts at 0, so it's +1 and not +2 in terms of boundary checking
                             console.CursorLeft = 0
                             Console.BackgroundColor = ConsoleColor.black
                             Console.ForegroundColor = ConsoleColor.white
-                            Console.Write(rssList(Console.CursorTop - 2))
+                            Console.Write(rssTitleList(Console.CursorTop - 2))
                             console.SetCursorPosition(0, console.CursorTop + 1)
                             Console.BackgroundColor = ConsoleColor.White
                             Console.ForegroundColor = ConsoleColor.Black
-                            Console.Write(rssList(Console.CursorTop - 2))
+                            Console.Write(rssTitleList(Console.CursorTop - 2))
                         end if
                     ElseIf key.Key = ConsoleKey.Enter Then
-                        Console.WriteLine("Enter pressed")
+                        getContent(rssLinkList(Console.CursorTop - 2))
                         Exit While
                     End If
             End Select
@@ -89,8 +111,12 @@ Module Program
         Console.ReadLine()
     End Sub
     
-    sub testSub()
-        dim sr as SmartReader.Reader = new smartreader.Reader("https://www.w3schools.io/xml-escape-characters/") ' article to download
+    Function getContent(link)
+        Console.BackgroundColor = ConsoleColor.black
+        Console.ForegroundColor = ConsoleColor.white
+        Console.Clear()
+        
+        dim sr as SmartReader.Reader = new smartreader.Reader(link) ' article to download
         
         dim article as SmartReader.article = sr.GetArticle() ' download article
         dim rawContent as string = article.Content ' article stored in a variable as a string to manipulate
@@ -135,10 +161,6 @@ Module Program
             Next
             
             for i as integer = 0 to prettyParagraphs.Length - 2
-                prettyParagraphs(i) = prettyParagraphs(i).Replace("&amp;", "&") 
-                prettyParagraphs(i) = prettyParagraphs(i).Replace("&lt;", "<") ' replace escape sequences with correct characters in each paragraph
-                prettyParagraphs(i) = prettyParagraphs(i).Replace("&gt;", ">")
-                
                 
                 shouldWriteParagraph = True
                 if article.SiteName = "BBC News" and i = 0 ' BBC News edge case
@@ -152,6 +174,10 @@ Module Program
                 End Try
             
                 if shouldWriteParagraph = True ' if the paragraph isn't empty
+                    prettyParagraphs(i) = prettyParagraphs(i).Replace("&amp;", "&") 
+                    prettyParagraphs(i) = prettyParagraphs(i).Replace("&lt;", "<") ' replace escape sequences with correct characters in each paragraph
+                    prettyParagraphs(i) = prettyParagraphs(i).Replace("&gt;", ">")
+                    
                     Console.WriteLine(prettyParagraphs(i))
                     if not i = prettyParagraphs.Length - 2 
                         Console.WriteLine() ' if it's not the end, line break
@@ -163,6 +189,9 @@ Module Program
             Console.WriteLine("Content paywalled or otherwise unaccessible.") ' < if content isn't readable
         End If
         
-        Console.ReadLine()
-    End sub
+        
+        Console.Readline()
+    End Function
+    
+
 End Module

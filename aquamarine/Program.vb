@@ -229,7 +229,7 @@ Module Program
 ' TODO ADD A FOR LOOP FOR EACH PARAGRAPH, THEN THE THING BELOW WILL BE SET TO I, MAYBE AUTOSKIP PARAGRAPHS CAUSE IM LAZY
         ' TODO HANDLE THE ENTER KEY BEING PRESSED
         
-        do until prettyParagraphs(0) = userParagraphs(0)
+        do until (userParagraphs(0) = prettyParagraphs(0))
             
 
             userCharInput = Console.ReadKey(True).KeyChar
@@ -254,6 +254,7 @@ Module Program
             
             ' TODO HANDLE BACKSPACES, THIS WILL LEAD TO A DELETION FROM THE ARRAY AND A RESTORATION OF THE PREVIOUS COLOR AND CHARACTER, AND DECREASE CHARACTERSENTERED BY 1,
         loop
+        ' TODO:!!!!!! TRIM ANY NULL PRETTYPARAGRAPHS TO AVOID A COMPARISON OF NULL VALUES LEADING TO SKIPPING TO THE LINE BELOW THE COMPARISON IS BORKED
         
         Console.Clear()
         Console.Writeline("you win!")

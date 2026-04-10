@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="SmartReader" Version="0.11.0" />
-      <PackageReference Include="System.ServiceModel.Syndication" Version="11.0.0-preview.2.26159.112" />
+        <PackageReference Include="SmartReader" Version="0.11.0"/>
+        <PackageReference Include="System.ServiceModel.Syndication" Version="11.0.0-preview.2.26159.112"/>
     </ItemGroup>
 
 </Project>

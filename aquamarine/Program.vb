@@ -15,6 +15,15 @@ Module Program
     Sub Main(args As String())
         
         Console.Clear() ' get rid of the accursed yellow boot text in rider-- no effect in prod
+        
+        console.WriteLine("AQUAMARINE 1.0.0-ALPHA")
+        Console.WriteLine("PLEASE RUN IN FULL SCREEN TO PREVENT ERRORS")
+        Console.WriteLine()
+        Console.WriteLine("PRESS ANY KEY TO CONTINUE")
+        Console.ReadKey()
+        
+        Console.Clear()
+        
         Console.ForegroundColor = ConsoleColor.White
         dim rssTitleList(0) as String ' stores list of all rss posts
         dim rssLinkList(0) as String ' stores list of all rss links
@@ -29,7 +38,7 @@ Module Program
         Console.WriteLine()
         
         Try
-        Using reader as XmlReader = XmlReader.Create("https://feeds.arstechnica.com/arstechnica/index")  ' ' Download data, should ask user
+        Using reader as XmlReader = XmlReader.Create("https://www.theverge.com/rss/partner/subscriber-only-full-feed/rss.xml")  ' ' Download data, should ask user
             synFeed = SyndicationFeed.Load(reader)
         End Using
         
@@ -37,20 +46,13 @@ Module Program
         synFeed.SaveAsRss20(writer)
         End Using
         Catch
-            rawRSS = "There was an exception!"  ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
+            rawRSS = "There was an exception!"  ' TODO EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
             End Try
         
         xmlRSS.LoadXml(sb.ToString())
         
-'        try
-'            rawRSS = client.DownloadString("https://rss.app/feeds/daGiDlOdecTa06Vb.xml") ' Download data as string, should ask user
-'        Catch ex as Exception ' if the url is incorrect
-'            rawRSS = "There was an exception!" ' EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
-'        End try
-'        xmlRSS.loadxml(rawRSS) ' take string downloaded and store in xmldocument variable xmlRSS
-        
         dim item as XmlNode
-        Dim nodeList as XmlNodeList ' i need a try here-- if the xml is invalid
+        Dim nodeList as XmlNodeList ' TODO i need a try here-- if the xml is invalid
         Dim root as XmlNode = xmlRSS.DocumentElement
         nodeList=root.SelectNodes("//*[local-name()='entry' or local-name()='item']")
         
@@ -64,6 +66,9 @@ Module Program
         next 
         Array.resize(rssTitleList, rssTitleList.length-1) ' get rid of empty string at the end
         Array.resize(rssLinkList, rssLinkList.length-1) 
+        
+        Array.resize(rssTitleList, 20) ' get rid of empty string at the end
+        Array.resize(rssLinkList, 20) 
         
         for i as integer = 0 to rssTitleList.Length-1
             console.WriteLine(rssTitleList(i))
@@ -115,6 +120,7 @@ Module Program
         Console.BackgroundColor = ConsoleColor.black
         Console.ForegroundColor = ConsoleColor.white
         Console.Clear()
+        Console.WriteLine("Loading...")
         
         dim sr as SmartReader.Reader = new smartreader.Reader(link) ' article to download
         
@@ -137,7 +143,7 @@ Module Program
             
                 if rawContent.Substring(i, 1) = "<" ' if the opening of a tag is detected...
                     if rawContent.Substring(i+1, 2) = "p>"  and not rawContent.Substring(i+3, 1) = "<" ' if the rest of the tag is p>, and there are no tags immediately inside...
-                        endOfParagraph = False ' it is no longer the end of the paragraph
+                        endOfParagraph = False ' it is no longer the end of the paragraph, but the start of one!
                         startParagraphAfter = i+2 'start paragraph after i+2, which is > in a <p> tag, considering i would be <
                     End If
                 
@@ -160,6 +166,8 @@ Module Program
                 End If
             Next
             
+            Console.Clear()
+            
             for i as integer = 0 to prettyParagraphs.Length - 2
                 
                 shouldWriteParagraph = True
@@ -169,29 +177,44 @@ Module Program
             
                 Try ' to determine whether a paragraph is empty, try to find its length
                     paragraphLength = prettyParagraphs(i).ToString().Length
-                Catch ' if an exception throws, don't write the paragraph by changing the variable
+                Catch ' if an exception throws, don't write the paragraph by changing the variable 
                     shouldWriteParagraph = False
                 End Try
             
+                
                 if shouldWriteParagraph = True ' if the paragraph isn't empty
+                    Console.ForegroundColor = ConsoleColor.DarkGray
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&amp;", "&") 
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&lt;", "<") ' replace escape sequences with correct characters in each paragraph
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&gt;", ">")
                     prettyParagraphs(i) = prettyParagraphs(i).replace("&nbsp;", " ")
                     
-                    Console.WriteLine(prettyParagraphs(i))
+                    Console.Writeline(prettyParagraphs(i))
                     if not i = prettyParagraphs.Length - 2 
                         Console.WriteLine() ' if it's not the end, line break
                     End If
+                    
                 End If
             Next
         
         Else 
-            Console.WriteLine("Content paywalled or otherwise unaccessible.") ' < if content isn't readable
+            Console.WriteLine("Content paywalled or otherwise unaccessible.") ' < if content isn't readable TODO so what does the user do now? do we return them? where to?
+            Threading.Thread.sleep(1000)
+            Environment.Exit(0)
         End If
         
+        timetotype()
         
-        Console.Readline()
+        dim userString(prettyParagraphs.Length) as String
+        dim charCounter as Integer
+        
+        Console.WriteLine(Console.ReadKey().KeyChar)
+        
+    End Function
+    
+    Function timetotype()
+        Console.SetCursorPosition(0,0)
+        Console.ForegroundColor = ConsoleColor.White
     End Function
     
 

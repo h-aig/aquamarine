@@ -236,8 +236,13 @@ Module Program
         dim numericUserCharInput as ConsoleKeyInfo
         Dim userCharInput as Char
         dim currentCorrectChar as Char
-        dim userParagraphs(prettyParagraphs.Length - 1)
-        dim totalCharacters as integer = 0 
+        dim userParagraphs(prettyParagraphs.Length - 2)
+                
+        for i as integer = 0 to userParagraphs.Length - 1
+            userParagraphs(i) = ""    
+        Next
+        
+        dim totalCharacters as integer = 0
         
 ' TODO ADD A FOR LOOP FOR EACH PARAGRAPH, THEN THE THING BELOW WILL BE SET TO I, MAYBE AUTOSKIP PARAGRAPHS CAUSE IM LAZY
         ' TODO HANDLE THE ENTER KEY BEING PRESSED
@@ -246,37 +251,64 @@ Module Program
             
             numericUserCharInput = console.ReadKey(True)
             userCharInput = numericUserCharInput.KeyChar ' TODO COMMENT THIS, AND ALSO WITH THIS I CAN EXCLUDE CHARACTERS MONKEYTYPE DOESN'T REGISTER LIKE ARROW KEYS
-            currentCorrectChar = prettyParagraphs(0).ToString().Substring(console.CursorLeft, 1) ' todo THIS DON'T WORK WHEN WE'RE ON A NEW LINE 
-            
+            currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalCharacters, 1) ' todo THIS DON'T WORK WHEN WE'RE ON A NEW LINE 
             
             if userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8
                 Console.ForegroundColor = consolecolor.White
                 console.Write(userCharInput)
-                userParagraphs(0) = userParagraphs(0) + userCharInput ' TODO WATCH THIS
                 
-            Else if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8
+                userParagraphs(0) = userParagraphs(0) + userCharInput ' TODO WATCH THIS
+                totalCharacters = totalCharacters + 1
+            End If    
+            
+            if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8 and (userCharInput = "'" or userCharInput = Chr(34))  ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES AND NONSTANDARD CHARACTERS
+                Console.ForegroundColor = consolecolor.White
+                console.Write(currentcorrectchar)
+                
+                userParagraphs(0) = userParagraphs(0) + currentcorrectchar ' TODO WATCH THIS
+                totalCharacters = totalCharacters + 1
+            End If
+            ' ^ only if the user writes ' which parses weird, need to make a list of these edge cases that may not translate
+                
+            if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8  and not (userCharInput = "'" or userCharInput = Chr(34)) ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES
                 Console.ForegroundColor = consolecolor.red
                 Console.Write(currentCorrectChar)
                 
-                if currentCorrectChar = " "
-                    Console.CursorLeft = console.CursorLeft - 1 ' no idea why I need this if the current correct character is a whitespace but oh well
-                    Console.ForegroundColor = ConsoleColor.Cyan
-                    Console.Write(userCharInput)
-                End If
-                
+                userParagraphs(0) = userParagraphs(0) + userCharInput ' TODO WATCH THIS
+                totalCharacters = totalCharacters + 1
             End If
             
-            if numericUserCharInput.Key = 8 and not Console.cursorleft = 0 ' handle backspaces 
+            if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8 and currentCorrectChar = " "
+                Console.CursorLeft = console.CursorLeft - 1 ' no idea why I need this if the current correct character is a whitespace but oh well
+                Console.ForegroundColor = ConsoleColor.Cyan
+                Console.Write(userCharInput)
+                
+                userParagraphs(0) = userParagraphs(0) + currentCorrectChar ' TODO WATCH THIS
+            End If
+            
+            if numericUserCharInput.Key = 8 and not Console.cursorleft = 0 ' handle backspaces
+                
                 Console.ForegroundColor = ConsoleColor.DarkGray
                 Console.CursorLeft = console.CursorLeft - 1
                 
-                currentCorrectChar = prettyParagraphs(0).ToString().Substring(console.CursorLeft, 1)
+                userParagraphs(0) = userParagraphs(0).ToString().Substring(0, userParagraphs(0).ToString().Length - 1)   ' TODO WATCH THIS
+                totalCharacters = totalCharacters - 1
+                
+                currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalcharacters, 1)
                 Console.Write(currentCorrectChar)
-
                 Console.CursorLeft = console.CursorLeft - 1
+                
             End If
-            
             ' TODO HANDLE BACKSPACES, THIS WILL LEAD TO A DELETION FROM THE ARRAY AND A RESTORATION OF THE PREVIOUS COLOR AND CHARACTER, AND DECREASE CHARACTERSENTERED BY 1,
+            ' TODO ENTER KEY NEEDS PATCHING THIS IS A MAD EDGE CASE
+            ' TODO NEED A WAY TO GO BACK FROM AN ARTICLE IF CURSORLEFT = 0? OR WITH A MODIFER + CHARACTER?
+            ' TODO SPECIAL CHARACTER HANDLING IS BORKED AND I NEED A WAY TO GO BACK TO THE PREVIOUS LINE AS WELL
+            ' TODO A LOT OF WEIRD FEEDS LIKE https://rss-generator.toromonja.com/f/55f797e4-5492-4de4-80c9-66914fc7fe5c DON'T WORK EVEN THOUGH FEED NAMES ARE FETCHED
+            ' TODO I NEED TO ELIMINATE ANY NULL PARAGRAPHS BEFORE MAKING USERPARAGRAPHS EQUAL TO IT OR JUST CHECK WHETHER IT'S THE LAST USERPARAGRAPH BECAUSE THE LAST 2 ARE ALWAYS EMPTY
+            ' TODO LITERAL EDGE CASE IF ON THE BOUNDARY IT TWEAKS OUT, CHARACTERS DON'T REGISTER WELL IF INCORRECT AND THEN YOU BACKSPACE, I THINK IT'S SPACES THAT BORK IT
+            ' TODO NEED AN OR LENGTH OF USERXYZ IS EQUAL OR HIGHER THAN PRETTYPARAGRAPHS
+            ' TODO IT BREAKS IF YOU BACKSPACE AT THE END ALSO
+            ' TODO HANDLE NULL CASES IN THE EVENT OF KEYS SUCH AS ARROW KEYS BEING PRESSED
         loop
         
         Console.Clear()

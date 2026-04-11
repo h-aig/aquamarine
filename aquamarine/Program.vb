@@ -157,10 +157,21 @@ Module Program
                         'start paragraph after i+2, which is > in a <p> tag, considering i would be <
                     End If
 
-                    If rawContent.Substring(i + 1, 3) = "/p>" ' if the closing of a tag is detected...
+                    If rawContent.Substring(i + 1, 3) = "/p>" ' if the closing of a tag is detected... TODO COMMENT THIS; the checks for null and whitespace within this if block
                         endOfParagraph = True ' it is the end of a paragraph
                         Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1) _
                         ' increase the size of the array by 1 to accomodate another paragraph
+                        
+                        if prettyParagraphs(currentParagraphNum) = "null"
+                            Array.Resize(prettyParagraphs, prettyParagraphs.Length - 1)
+                        End If
+                        
+                        Try ' to determine whether a paragraph is empty, try to find its length
+                            paragraphLength = prettyParagraphs(currentParagraphNum).ToString().Length
+                        Catch ' if an exception throws, don't write the paragraph by changing the variable 
+                            Array.Resize(prettyParagraphs, prettyParagraphs.Length - 1)
+                        End Try
+                        
                     End If
                 End If
 
@@ -189,7 +200,7 @@ Module Program
                     shouldWriteParagraph = False
                 End If
 
-                Try ' to determine whether a paragraph is empty, try to find its length
+                Try ' to determine whether a paragraph is empty, try to find its length TODO uh probably redundant? see line 160 onwards
                     paragraphLength = prettyParagraphs(i).ToString().Length
                 Catch ' if an exception throws, don't write the paragraph by changing the variable 
                     shouldWriteParagraph = False
@@ -224,7 +235,6 @@ Module Program
         Dim userCharInput as Char
         dim currentCorrectChar as Char
         dim userParagraphs(prettyParagraphs.Length - 1)
-        dim charactersEntered as Integer = 0
         
 ' TODO ADD A FOR LOOP FOR EACH PARAGRAPH, THEN THE THING BELOW WILL BE SET TO I, MAYBE AUTOSKIP PARAGRAPHS CAUSE IM LAZY
         ' TODO HANDLE THE ENTER KEY BEING PRESSED
@@ -233,23 +243,22 @@ Module Program
             
 
             userCharInput = Console.ReadKey(True).KeyChar
-            currentCorrectChar = prettyParagraphs(0).ToString().Substring(charactersEntered, 1) ' todo THIS DON'T WORK WHEN WE'RE ON A NEW LINE 
+            currentCorrectChar = prettyParagraphs(0).ToString().Substring(console.CursorLeft, 1) ' todo THIS DON'T WORK WHEN WE'RE ON A NEW LINE 
 
             
             if userCharInput = currentCorrectChar and Not userCharInput = " "
                 Console.ForegroundColor = consolecolor.White
+                console.Write(userCharInput)
             Else
                 Console.ForegroundColor = consolecolor.red
+                Console.Write(currentCorrectChar)
             End If
 
             if userCharInput = " " and not currentCorrectChar = " "
-                Console.ForegroundColor = consolecolor.red
+                Console.ForegroundColor = consolecolor.red ' TODO HANDLE BACKSPACES 
+                console.Write(userCharInput)
             End If
             
-
-            
-            console.Write(userCharInput)
-            charactersEntered =+ 1
             userParagraphs(0) = userParagraphs(0) + userCharInput
             
             ' TODO HANDLE BACKSPACES, THIS WILL LEAD TO A DELETION FROM THE ARRAY AND A RESTORATION OF THE PREVIOUS COLOR AND CHARACTER, AND DECREASE CHARACTERSENTERED BY 1,

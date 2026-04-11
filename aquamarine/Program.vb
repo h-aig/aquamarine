@@ -138,7 +138,7 @@ Module Program
         dim currentParagraphNum as integer ' stores current paragraph number
         dim startParagraphAfter as Integer ' after this character number, start writing the paragraph
         dim ignoreChars as boolean = False ' ignore intra-paragraph tags containing things such as images
-        dim shouldWriteParagraph as Boolean = True ' write the paragraph, unless it's empty
+        dim shouldWriteParagraph as Boolean ' write the paragraph, unless it's empty
         Dim paragraphLength as Integer _
         ' used to determine whether the paragraph is empty, and thus shouldWriteParagraph status
 
@@ -231,39 +231,53 @@ Module Program
         End If
 
         timetotype()
-
+        
+        
+        dim numericUserCharInput as ConsoleKeyInfo
         Dim userCharInput as Char
         dim currentCorrectChar as Char
         dim userParagraphs(prettyParagraphs.Length - 1)
+        dim totalCharacters as integer = 0 
         
 ' TODO ADD A FOR LOOP FOR EACH PARAGRAPH, THEN THE THING BELOW WILL BE SET TO I, MAYBE AUTOSKIP PARAGRAPHS CAUSE IM LAZY
         ' TODO HANDLE THE ENTER KEY BEING PRESSED
         
         do until (userParagraphs(0) = prettyParagraphs(0))
             
-
-            userCharInput = Console.ReadKey(True).KeyChar
+            numericUserCharInput = console.ReadKey(True)
+            userCharInput = numericUserCharInput.KeyChar ' TODO COMMENT THIS, AND ALSO WITH THIS I CAN EXCLUDE CHARACTERS MONKEYTYPE DOESN'T REGISTER LIKE ARROW KEYS
             currentCorrectChar = prettyParagraphs(0).ToString().Substring(console.CursorLeft, 1) ' todo THIS DON'T WORK WHEN WE'RE ON A NEW LINE 
-
             
-            if userCharInput = currentCorrectChar and Not userCharInput = " "
+            
+            if userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8
                 Console.ForegroundColor = consolecolor.White
                 console.Write(userCharInput)
-            Else
+                userParagraphs(0) = userParagraphs(0) + userCharInput ' TODO WATCH THIS
+                
+            Else if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8
                 Console.ForegroundColor = consolecolor.red
                 Console.Write(currentCorrectChar)
-            End If
-
-            if userCharInput = " " and not currentCorrectChar = " "
-                Console.ForegroundColor = consolecolor.red ' TODO HANDLE BACKSPACES 
-                console.Write(userCharInput)
+                
+                if currentCorrectChar = " "
+                    Console.CursorLeft = console.CursorLeft - 1 ' no idea why I need this if the current correct character is a whitespace but oh well
+                    Console.ForegroundColor = ConsoleColor.Cyan
+                    Console.Write(userCharInput)
+                End If
+                
             End If
             
-            userParagraphs(0) = userParagraphs(0) + userCharInput
+            if numericUserCharInput.Key = 8 and not Console.cursorleft = 0 ' handle backspaces 
+                Console.ForegroundColor = ConsoleColor.DarkGray
+                Console.CursorLeft = console.CursorLeft - 1
+                
+                currentCorrectChar = prettyParagraphs(0).ToString().Substring(console.CursorLeft, 1)
+                Console.Write(currentCorrectChar)
+
+                Console.CursorLeft = console.CursorLeft - 1
+            End If
             
             ' TODO HANDLE BACKSPACES, THIS WILL LEAD TO A DELETION FROM THE ARRAY AND A RESTORATION OF THE PREVIOUS COLOR AND CHARACTER, AND DECREASE CHARACTERSENTERED BY 1,
         loop
-        ' TODO:!!!!!! TRIM ANY NULL PRETTYPARAGRAPHS TO AVOID A COMPARISON OF NULL VALUES LEADING TO SKIPPING TO THE LINE BELOW THE COMPARISON IS BORKED
         
         Console.Clear()
         Console.Writeline("you win!")

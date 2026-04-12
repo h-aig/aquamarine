@@ -298,20 +298,15 @@ Module Program
             currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalCharacters, 1) ' todo turn this into a function
             
             if  correctAlphaNumberic(userCharInput, currentCorrectChar) = true and isSpace(numericUserCharInput.key) = false ' if the character the user typed is correct, and not a backspace...
-                Console.ForegroundColor = consolecolor.White 
-                console.Write(userCharInput) ' write
-                
+                PrintCorrectChar(currentCorrectChar)
                 userParagraphs(0) = userParagraphs(0) + userCharInput ' add character to the current paragraph the user has writter 
                 totalCharacters = totalCharacters + 1
             End If    
             
             if correctAlphaNumberic(userCharInput, currentCorrectChar) = false  and isSpace(numericUserCharInput.Key) = false and  correctNonStandard(userCharInput, currentCorrectChar) = true  ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES AND NONSTANDARD CHARACTERS
-                Console.ForegroundColor = consolecolor.White
-                console.Write(currentcorrectchar)
-                
+                PrintCorrectChar(currentCorrectChar)
                 userParagraphs(0) = userParagraphs(0) + currentcorrectchar
                 totalCharacters = totalCharacters + 1
-                
                 Else 
                     Console.ForegroundColor = consolecolor.red
                     Console.Write(currentCorrectChar) ' todo THIS ELSE BREAKS THINGS-- CREATE FUNCTIONS CORRECTCHAR() AND INCORRECTCHAR() TO HOLD BOTH OUTCOMES
@@ -322,9 +317,7 @@ Module Program
             ' ^ only if the user writes ' which parses weird, need to make a list of these edge cases that may not translate
                 
             if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8  and charNonStandard(userCharInput) = False ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES
-                Console.ForegroundColor = consolecolor.red
-                Console.Write(currentCorrectChar)
-                
+                PrintIncorrectChar(currentCorrectChar)
                 userParagraphs(0) = userParagraphs(0) + userCharInput
                 totalCharacters = totalCharacters + 1
             End If
@@ -393,16 +386,27 @@ Module Program
         return false
     End function
     
-    function correctNonStandard(userChar, correctChar)
+    function CorrectNonStandard(userChar, correctChar)
         if (userChar = "'" or userChar = Chr(34))
             if (correctChar = "‘" or correctChar = "’") and userChar = "'"
                 Return true
             End If
             ElseIf (correctChar = ""“"" or correctChar = ""”"") and userChar = chr(34)
                 return true
-                
         End If
           return false  
     End function
+    
+    private sub PrintCorrectChar(correctChar)
+        Console.ForegroundColor = consolecolor.White
+        console.Write(correctChar)
+        return
+    end sub
+    
+    private sub PrintIncorrectChar(correctChar)
+        Console.ForegroundColor = consolecolor.red
+        console.Write(correctChar)
+        return
+    end sub
     
 End Module

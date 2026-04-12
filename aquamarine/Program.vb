@@ -42,9 +42,10 @@ Module Program
             Console.write("Loading...")
             Using _
                 reader as XmlReader =
-                    XmlReader.Create("http://lorem-rss.herokuapp.com/feed") _
+                    XmlReader.Create("https://www.theverge.com/rss/partner/subscriber-only-full-feed/rss.xml") _
                 ' ' Download data, should ask user
                 synFeed = SyndicationFeed.Load(reader)
+                Console.CursorLeft() = 0
             End Using
 
             Using writer as XmlWriter = XmlWriter.Create(sb)
@@ -296,7 +297,7 @@ Module Program
             userCharInput = numericUserCharInput.KeyChar ' TODO COMMENT THIS, AND ALSO WITH THIS I CAN EXCLUDE CHARACTERS MONKEYTYPE DOESN'T REGISTER LIKE ARROW KEYS
             currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalCharacters, 1) ' todo turn this into a function
             
-            if  alphaNumberic(userCharInput, currentCorrectChar, numericUserCharInput.Key) = true ' if the character the user typed is correct, and not a backspace...
+            if  correctAlphaNumberic(userCharInput, currentCorrectChar) = true and isSpace(numericUserCharInput.key) = false ' if the character the user typed is correct, and not a backspace...
                 Console.ForegroundColor = consolecolor.White 
                 console.Write(userCharInput) ' write
                 
@@ -304,12 +305,19 @@ Module Program
                 totalCharacters = totalCharacters + 1
             End If    
             
-            if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8 and (userCharInput = "'" or userCharInput = Chr(34))  ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES AND NONSTANDARD CHARACTERS
+            if correctAlphaNumberic(userCharInput, currentCorrectChar) = false  and isSpace(numericUserCharInput.Key) = false and  correctNonStandard(userCharInput, currentCorrectChar) = true  ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES AND NONSTANDARD CHARACTERS
                 Console.ForegroundColor = consolecolor.White
                 console.Write(currentcorrectchar)
                 
                 userParagraphs(0) = userParagraphs(0) + currentcorrectchar
                 totalCharacters = totalCharacters + 1
+                
+                Else 
+                    Console.ForegroundColor = consolecolor.red
+                    Console.Write(currentCorrectChar) ' todo THIS ELSE BREAKS THINGS-- CREATE FUNCTIONS CORRECTCHAR() AND INCORRECTCHAR() TO HOLD BOTH OUTCOMES
+                
+                    userParagraphs(0) = userParagraphs(0) + userCharInput
+                    totalCharacters = totalCharacters + 1
             End If
             ' ^ only if the user writes ' which parses weird, need to make a list of these edge cases that may not translate
                 
@@ -371,11 +379,30 @@ Module Program
         return false
     End function
     
-    function alphaNumberic(userChar, correctChar, key)
-        if userChar = correctChar and not key = 8 ' if key is correct and not a space
+    function correctAlphaNumberic(userChar, correctChar)
+        if userChar = correctChar ' if key is correct and not a space
             return true
         End If
         return false
+    End function
+    
+    function isSpace(key)
+        if key = 8
+            return true
+        End If
+        return false
+    End function
+    
+    function correctNonStandard(userChar, correctChar)
+        if (userChar = "'" or userChar = Chr(34))
+            if (correctChar = "‘" or correctChar = "’") and userChar = "'"
+                Return true
+            End If
+            ElseIf (correctChar = ""“"" or correctChar = ""”"") and userChar = chr(34)
+                return true
+                
+        End If
+          return false  
     End function
     
 End Module

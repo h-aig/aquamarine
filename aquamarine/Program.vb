@@ -13,7 +13,7 @@ Imports System.ServiceModel.Syndication
 Imports System.Text
 
 Module Program
-    Sub Main(args As String())
+    Sub Main()
 
         Console.Clear() ' get rid of the accursed yellow boot text in rider-- no effect in prod
 
@@ -39,9 +39,10 @@ Module Program
         Console.WriteLine()
 
         Try
+            Console.write("Loading...")
             Using _
                 reader as XmlReader =
-                    XmlReader.Create("https://www.theverge.com/rss/partner/subscriber-only-full-feed/rss.xml") _
+                    XmlReader.Create("https://www.") _
                 ' ' Download data, should ask user
                 synFeed = SyndicationFeed.Load(reader)
             End Using
@@ -49,16 +50,47 @@ Module Program
             Using writer as XmlWriter = XmlWriter.Create(sb)
                 synFeed.SaveAsRss20(writer)
             End Using
+            
         Catch
-            rawRSS = "There was an exception!"  ' TODO EXPAND ON THIS: WHAT TO DO IF THE URL IS INCORRECT?
+            console.clear
+            While Console.KeyAvailable
+                Console.ReadKey(True) ' flush the buffer so keys pressed during download don't skip into this quickly, confusing users
+            End While
+            
+            console.WriteLine("This is an invalid URL. Press any key to go back to the previous page.") 
+            Threading.Thread.Sleep(1000)
+            Console.ReadKey(True)
+            
+            Console.Clear()
+            Console.WriteLine("Key pressed! Sending you back...")
+            Threading.Thread.sleep(1000)
+            
+            Main()
         End Try
 
         xmlRSS.LoadXml(sb.ToString())
 
         dim item as XmlNode
-        Dim nodeList as XmlNodeList ' TODO i need a try here-- if the xml is invalid
+        Dim nodeList as XmlNodeList ' TODO Abstract this, we're copying the same one from above come on
         Dim root as XmlNode = xmlRSS.DocumentElement
-        nodeList = root.SelectNodes("//*[local-name()='entry' or local-name()='item']")
+        Try
+            nodeList = root.SelectNodes("//*[local-name()='entry' or local-name()='item']")
+        catch
+            console.clear
+            While Console.KeyAvailable
+                Console.ReadKey(True) 
+            End While
+            
+            console.WriteLine("XML invalid! Press any key to go back to the previous page.") 
+            Threading.Thread.Sleep(1000)
+            Console.ReadKey(True)
+            
+            Console.Clear()
+            Console.WriteLine("Key pressed! Sending you back...")
+            Threading.Thread.sleep(1000)
+            
+            Main()
+        End Try
 
         for each item in nodeList ' for each post in the feed...
             dim title as XmlNode = item.SelectSingleNode("title") ' find title
@@ -308,7 +340,7 @@ Module Program
             ' TODO LITERAL EDGE CASE IF ON THE BOUNDARY IT TWEAKS OUT, CHARACTERS DON'T REGISTER WELL IF INCORRECT AND THEN YOU BACKSPACE, I THINK IT'S SPACES THAT BORK IT
             ' TODO NEED AN OR LENGTH OF USERXYZ IS EQUAL OR HIGHER THAN PRETTYPARAGRAPHS
             ' TODO IT BREAKS IF YOU BACKSPACE AT THE END ALSO
-            ' TODO HANDLE NULL CASES IN THE EVENT OF KEYS SUCH AS ARROW KEYS BEING PRESSED
+            ' TODO HANDLE NULL CASES IN THE EVENT OF KEYS SUCH AS ARROW KEYS BEING PRESSED 
         loop
         
         Console.Clear()

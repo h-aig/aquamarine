@@ -42,7 +42,7 @@ Module Program
             Console.write("Loading...")
             Using _
                 reader as XmlReader =
-                    XmlReader.Create("https://www.") _
+                    XmlReader.Create("http://lorem-rss.herokuapp.com/feed") _
                 ' ' Download data, should ask user
                 synFeed = SyndicationFeed.Load(reader)
             End Using
@@ -57,7 +57,7 @@ Module Program
                 Console.ReadKey(True) ' flush the buffer so keys pressed during download don't skip into this quickly, confusing users
             End While
             
-            console.WriteLine("This is an invalid URL. Press any key to go back to the previous page.") 
+            console.WriteLine("This is an invalid URL, or is not an RSS Feed. Press any key to go back to the previous page.") 
             Threading.Thread.Sleep(1000)
             Console.ReadKey(True)
             
@@ -189,13 +189,13 @@ Module Program
                         'start paragraph after i+2, which is > in a <p> tag, considering i would be <
                     End If
 
-                    If rawContent.Substring(i + 1, 3) = "/p>" ' if the closing of a tag is detected... TODO COMMENT THIS; the checks for null and whitespace within this if block
+                    If rawContent.Substring(i + 1, 3) = "/p>" ' if the closing of a tag is detected...
                         endOfParagraph = True ' it is the end of a paragraph
                         Array.Resize(prettyParagraphs, prettyParagraphs.Length + 1) _
                         ' increase the size of the array by 1 to accomodate another paragraph
                         
-                        if prettyParagraphs(currentParagraphNum) = "null"
-                            Array.Resize(prettyParagraphs, prettyParagraphs.Length - 1)
+                        if prettyParagraphs(currentParagraphNum) = "null" ' if null....
+                            Array.Resize(prettyParagraphs, prettyParagraphs.Length - 1) ' decrease the length of the array by one; we don't need another one currently
                         End If
                         
                         Try ' to determine whether a paragraph is empty, try to find its length
@@ -232,7 +232,7 @@ Module Program
                     shouldWriteParagraph = False
                 End If
 
-                Try ' to determine whether a paragraph is empty, try to find its length TODO uh probably redundant? see line 160 onwards
+                Try ' to determine whether a paragraph is empty, try to find its length PROBABLY REDUNDANT 
                     paragraphLength = prettyParagraphs(i).ToString().Length
                 Catch ' if an exception throws, don't write the paragraph by changing the variable 
                     shouldWriteParagraph = False
@@ -256,10 +256,21 @@ Module Program
             Next
 
         Else
-            Console.WriteLine("Content paywalled or otherwise unaccessible.") _
-            ' < if content isn't readable TODO so what does the user do now? do we return them? where to?
+            Console.WriteLine() 
+            console.clear
+            While Console.KeyAvailable
+                Console.ReadKey(True) 
+            End While
+            
+            console.WriteLine("Content paywalled or otherwise unaccessible. Press any key to go back to the home page.") ' TODO MAKE THIS GO BACK TO THE PREVIOUS PAGE OF THE LIST WHEN APPROPRIATELY MOVED INTO ANOTHER FUNCTION 
+            Threading.Thread.Sleep(1000)
+            Console.ReadKey(True)
+            
+            Console.Clear()
+            Console.WriteLine("Key pressed! Sending you back...")
             Threading.Thread.sleep(1000)
-            Environment.Exit(0)
+            
+            Main() ' TODO SEE ABOVE
         End If
 
         timetotype()
@@ -283,13 +294,13 @@ Module Program
             
             numericUserCharInput = console.ReadKey(True)
             userCharInput = numericUserCharInput.KeyChar ' TODO COMMENT THIS, AND ALSO WITH THIS I CAN EXCLUDE CHARACTERS MONKEYTYPE DOESN'T REGISTER LIKE ARROW KEYS
-            currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalCharacters, 1) ' todo THIS DON'T WORK WHEN WE'RE ON A NEW LINE 
+            currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalCharacters, 1) ' todo turn this into a function
             
-            if userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8
-                Console.ForegroundColor = consolecolor.White
-                console.Write(userCharInput)
+            if  alphaNumberic(userCharInput, currentCorrectChar, numericUserCharInput.Key) = true ' if the character the user typed is correct, and not a backspace...
+                Console.ForegroundColor = consolecolor.White 
+                console.Write(userCharInput) ' write
                 
-                userParagraphs(0) = userParagraphs(0) + userCharInput ' TODO WATCH THIS
+                userParagraphs(0) = userParagraphs(0) + userCharInput ' add character to the current paragraph the user has writter 
                 totalCharacters = totalCharacters + 1
             End If    
             
@@ -297,16 +308,16 @@ Module Program
                 Console.ForegroundColor = consolecolor.White
                 console.Write(currentcorrectchar)
                 
-                userParagraphs(0) = userParagraphs(0) + currentcorrectchar ' TODO WATCH THIS
+                userParagraphs(0) = userParagraphs(0) + currentcorrectchar
                 totalCharacters = totalCharacters + 1
             End If
             ' ^ only if the user writes ' which parses weird, need to make a list of these edge cases that may not translate
                 
-            if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8  and not (userCharInput = "'" or userCharInput = Chr(34)) ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES
+            if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8  and charNonStandard(userCharInput) = False ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES
                 Console.ForegroundColor = consolecolor.red
                 Console.Write(currentCorrectChar)
                 
-                userParagraphs(0) = userParagraphs(0) + userCharInput ' TODO WATCH THIS
+                userParagraphs(0) = userParagraphs(0) + userCharInput
                 totalCharacters = totalCharacters + 1
             End If
             
@@ -352,4 +363,19 @@ Module Program
         Console.SetCursorPosition(0, 0)
         Console.ForegroundColor = ConsoleColor.White
     End Function
+    
+    function charNonStandard(inputChar)
+        if (inputChar = "'" or inputChar = Chr(34)) ' if nonstandard character return true
+            return true
+        End If
+        return false
+    End function
+    
+    function alphaNumberic(userChar, correctChar, key)
+        if userChar = correctChar and not key = 8 ' if key is correct and not a space
+            return true
+        End If
+        return false
+    End function
+    
 End Module

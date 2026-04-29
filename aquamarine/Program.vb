@@ -12,7 +12,12 @@ Imports AngleSharp.Html.Dom
 Imports System.ServiceModel.Syndication
 Imports System.Text
 
+
 Module Program
+    
+    Private _userparagraphs()
+    private _totalCharacters as Integer
+    
     Sub Main()
 
         Console.Clear() ' get rid of the accursed yellow boot text in rider-- no effect in prod
@@ -280,46 +285,57 @@ Module Program
         dim numericUserCharInput as ConsoleKeyInfo
         Dim userCharInput as Char
         dim currentCorrectChar as Char
-        dim userParagraphs(prettyParagraphs.Length - 2)
+        redim _userparagraphs(prettyParagraphs.Length - 2)
                 
-        for i as integer = 0 to userParagraphs.Length - 1
-            userParagraphs(i) = ""    
+        
+        for i as integer = 0 to _userparagraphs.Length - 1
+            _userparagraphs(i) = ""    
         Next
         
-        dim totalCharacters as integer = 0
+         _totalCharacters  = 0
         
 ' TODO ADD A FOR LOOP FOR EACH PARAGRAPH, THEN THE THING BELOW WILL BE SET TO I, MAYBE AUTOSKIP PARAGRAPHS CAUSE IM LAZY
         ' TODO HANDLE THE ENTER KEY BEING PRESSED
         
-        do until (userParagraphs(0) = prettyParagraphs(0))
+        dim charEvaluationHolder as String
+        
+        do until (_userparagraphs(0) = prettyParagraphs(0)) ' TODO TIDY THIS SPAGHETTI CODE!!! MORE ABSTRACTION!!!
             
             numericUserCharInput = console.ReadKey(True)
             userCharInput = numericUserCharInput.KeyChar ' TODO COMMENT THIS, AND ALSO WITH THIS I CAN EXCLUDE CHARACTERS MONKEYTYPE DOESN'T REGISTER LIKE ARROW KEYS
-            currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalCharacters, 1) ' todo turn this into a function
+            currentCorrectChar = prettyParagraphs(0).ToString().Substring(_totalCharacters, 1) ' todo turn this into a function
             
-            if  correctAlphaNumberic(userCharInput, currentCorrectChar) = true and isSpace(numericUserCharInput.key) = false ' if the character the user typed is correct, and not a backspace...
-                PrintCorrectChar(currentCorrectChar)
-                userParagraphs(0) = userParagraphs(0) + userCharInput ' add character to the current paragraph the user has writter 
-                totalCharacters = totalCharacters + 1
-            End If    
+            charEvaluationHolder = CharEvaluation(userCharInput, currentCorrectChar, numericUserCharInput.key)
             
-            if correctAlphaNumberic(userCharInput, currentCorrectChar) = false  and isSpace(numericUserCharInput.Key) = false and  correctNonStandard(userCharInput, currentCorrectChar) = true  ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES AND NONSTANDARD CHARACTERS
+            if charEvaluationHolder = "correctAlphanumeric"
+                writeCorrectAlphanumeric(currentCorrectChar, usercharinput)
+                ' Else if charEvaluationHolder = "incorrectAlphanumeric"
+                  '  writeIncorrectAlphanumeric()
+            End If
+            
+            
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            
+            if correctAlphaNumberic(userCharInput, currentCorrectChar, numericUserCharInput.key) = false and correctNonStandard(userCharInput, currentCorrectChar) = true  ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES AND NONSTANDARD CHARACTERS
                 PrintCorrectChar(currentCorrectChar)
-                userParagraphs(0) = userParagraphs(0) + currentcorrectchar
-                totalCharacters = totalCharacters + 1
-                Else 
+                _userparagraphs(0) = _userparagraphs(0) + currentcorrectchar
+                _totalCharacters = _totalCharacters + 1
+                
+                Else if correctAlphaNumberic(userCharInput, currentCorrectChar, numericUserCharInput.key) = false and correctNonStandard(userCharInput, currentCorrectChar) = false
                     Console.ForegroundColor = consolecolor.red
                     Console.Write(currentCorrectChar) ' todo THIS ELSE BREAKS THINGS-- CREATE FUNCTIONS CORRECTCHAR() AND INCORRECTCHAR() TO HOLD BOTH OUTCOMES
-                
-                    userParagraphs(0) = userParagraphs(0) + userCharInput
-                    totalCharacters = totalCharacters + 1
+                    _userparagraphs(0) = _userparagraphs(0) + userCharInput
+                    _totalCharacters = _totalCharacters + 1
             End If
             ' ^ only if the user writes ' which parses weird, need to make a list of these edge cases that may not translate
+            
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                 
+            
             if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8  and charNonStandard(userCharInput) = False ' TODO REALLY SHOULD HAVE A LIST THIS IF CAN JUST REFERENCE OF EDGE CASES
                 PrintIncorrectChar(currentCorrectChar)
-                userParagraphs(0) = userParagraphs(0) + userCharInput
-                totalCharacters = totalCharacters + 1
+                _userparagraphs(0) = _userparagraphs(0) + userCharInput
+                _totalCharacters = _totalCharacters + 1
             End If
             
             if not userCharInput = currentCorrectChar and not numericUserCharInput.Key = 8 and currentCorrectChar = " "
@@ -327,7 +343,7 @@ Module Program
                 Console.ForegroundColor = ConsoleColor.Cyan
                 Console.Write(userCharInput)
                 
-                userParagraphs(0) = userParagraphs(0) + currentCorrectChar ' TODO WATCH THIS
+                _userparagraphs(0) = _userparagraphs(0) + currentCorrectChar ' TODO WATCH THIS
             End If
             
             if numericUserCharInput.Key = 8 and not Console.cursorleft = 0 ' handle backspaces
@@ -335,10 +351,10 @@ Module Program
                 Console.ForegroundColor = ConsoleColor.DarkGray
                 Console.CursorLeft = console.CursorLeft - 1
                 
-                userParagraphs(0) = userParagraphs(0).ToString().Substring(0, userParagraphs(0).ToString().Length - 1)   ' TODO WATCH THIS
-                totalCharacters = totalCharacters - 1
+                _userparagraphs(0) = _userparagraphs(0).ToString().Substring(0, _userparagraphs(0).ToString().Length - 1)   ' TODO WATCH THIS
+                _totalCharacters = _totalCharacters - 1
                 
-                currentCorrectChar = prettyParagraphs(0).ToString().Substring(totalcharacters, 1)
+                currentCorrectChar = prettyParagraphs(0).ToString().Substring(_totalCharacters, 1)
                 Console.Write(currentCorrectChar)
                 Console.CursorLeft = console.CursorLeft - 1
                 
@@ -359,11 +375,45 @@ Module Program
         Console.Writeline("you win!")
         
     End Function
+    
+    function CharEvaluation(userChar, correctChar, numericUserChar)
+        
+'        alphanumeric (DONE!)
+'        whitespace
+'        backspace
+'        nonstandard
+'        space
+        
+        if correctAlphaNumberic(userChar, correctChar, numericUserChar) = true
+            return "correctAlphanumeric"
+        End If
+        
+        
+    End function
 
+    function correctAlphaNumberic(userChar, correctChar, numericUserChar)
+        if (userChar = correctChar) and isSpace(numericUserChar) = false ' if key is correct and not a space
+            return true
+        End If
+        return false
+    End function
+    
+    Function writeCorrectAlphanumeric(character, usercharinput) ' todo check if this should just be a sub
+        PrintCorrectChar(character)
+        _userparagraphs(0) = _userparagraphs(0) + userCharInput ' add character to the current paragraph the user has writter 
+        _totalCharacters = _totalCharacters + 1
+    End Function
+    
+    function writeIncorrectAlphanumeric()
+        
+    End function
+    
     Function timetotype()
         Console.SetCursorPosition(0, 0)
         Console.ForegroundColor = ConsoleColor.White
     End Function
+    
+
     
     function charNonStandard(inputChar)
         if (inputChar = "'" or inputChar = Chr(34)) ' if nonstandard character return true
@@ -372,12 +422,7 @@ Module Program
         return false
     End function
     
-    function correctAlphaNumberic(userChar, correctChar)
-        if userChar = correctChar ' if key is correct and not a space
-            return true
-        End If
-        return false
-    End function
+
     
     function isSpace(key)
         if key = 8
@@ -395,6 +440,10 @@ Module Program
                 return true
         End If
           return false  
+    End function
+    
+    function CharCorrect()
+        
     End function
     
     private sub PrintCorrectChar(correctChar)

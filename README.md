@@ -31,3 +31,9 @@ It's just a console app!
 
 # How it works
 Literally just some http queries, traversing the feed's xml document to extract relevant nodes and print them on the screen! 
+
+<img width="3670" height="1916" alt="image" src="https://github.com/user-attachments/assets/9f89d759-3988-4e00-a55c-e6704ee13dbc" />
+<img width="3670" height="1916" alt="image" src="https://github.com/user-attachments/assets/216452ca-3e8b-470b-b1e6-191289bdd29c" />
+<img width="3670" height="1916" alt="image" src="https://github.com/user-attachments/assets/bd26cf4b-f937-4d5c-9ab2-94eef446daf6" />
+
+

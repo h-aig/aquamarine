@@ -12,3 +12,13 @@ We do everything else though (read; you can read your feeds, but we don't do ima
 
 # Installation
 We (I) have prebuilt binaries. Knock yourself out.
+
+**Linux only**: After installing the prebuilt binary, go to the directory it was saved to. Run
+```
+chmod -x linux-aquamarine
+```
+and then go ahead and run it with
+
+```
+./linux-aquamarine
+```

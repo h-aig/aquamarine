@@ -15,7 +15,7 @@ We (I) have prebuilt binaries. Knock yourself out.
 
 **Linux only**: After installing the prebuilt binary, go to the directory it was saved to. Run
 ```
-chmod -x linux-aquamarine
+chmod +x linux-aquamarine
 ```
 and then go ahead and run it with
 

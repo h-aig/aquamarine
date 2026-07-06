@@ -7,5 +7,8 @@
 
 We do everything else though (read; you can read your feeds, but we don't do images!)
 
+# Dependencies
+[.NET 9.0 Runtime, that's all!](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+
 # Installation
 We have prebuilt binaries. Knock yourself out.

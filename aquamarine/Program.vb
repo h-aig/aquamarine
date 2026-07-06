@@ -9,7 +9,8 @@ Module Program
     Private _nodeList as XmlNodeList
     Private _titlesAndLinks(,) ' create 2d array for storing titles/links
     Private _noStories as Integer
-    
+    Private _storySelected as Integer
+    Private  _keySelectstory as ConsoleKeyInfo
 
     sub Main()
         Console.Clear()
@@ -17,26 +18,9 @@ Module Program
         GetNodes(feedUrl)
         printStories()
 
-        dim storySelected as integer = selectStory()
+        _storySelected  = selectStory()
         Console.Clear()
-        getContent(_titlesAndLinks(storySelected, 1))
-        
-        dim key as ConsoleKeyInfo
-        
-        Do
-            key = Console.ReadKey(True)
-        Loop Until key.Key >= ConsoleKey.D1 AndAlso key.Key <= ConsoleKey.D3
-        
-        if (Key.key - 49) = 1
-            Environment.Exit(1)
-            ElseIf (key.key - 49) = 2
-                Main()
-                Else 
-                printStories()
-                selectStory()
-                getContent(_titlesAndLinks(storySelected, 1))
-        End If
-        
+        getContent(_titlesAndLinks(_storySelected, 1))
     End sub
 
     Function GetFeed()
@@ -116,12 +100,12 @@ Module Program
     End sub
 
     function selectStory()
-        dim key as ConsoleKeyInfo
-
+        
+        
         Do
-            key = Console.ReadKey(True)
-        Loop Until key.Key >= ConsoleKey.D1 AndAlso key.Key <= CType(ConsoleKey.D0 + _noStories, ConsoleKey)
-        return key.Key - 49
+            _keySelectstory = Console.ReadKey(True)
+        Loop Until _keySelectstory.Key >= ConsoleKey.D1 AndAlso _keySelectstory.Key <= CType(ConsoleKey.D0 + _noStories, ConsoleKey)
+        return _keySelectstory.Key - 49
     End function
 
     sub getContent(link)
@@ -241,7 +225,7 @@ Module Program
 
             Main() ' TODO SEE ABOVE
         End If
-        
+
         Console.WriteLine()
         Console.ForegroundColor = ConsoleColor.Yellow
         console.WriteLine("Press 1 to quit")
@@ -249,5 +233,26 @@ Module Program
         console.Write("Press 3 to go to story selection")
         Console.ResetColor()
         
+        dim key as ConsoleKeyInfo
+        
+        Do
+            key = Console.ReadKey(True)
+        Loop Until key.Key >= ConsoleKey.D1 AndAlso key.Key <= ConsoleKey.D3
+
+        _keySelectstory = Nothing
+        
+        Select Case key.Key
+            Case ConsoleKey.D1
+                Environment.Exit(0)
+
+            Case ConsoleKey.D2
+                Console.WriteLine("check!")
+                Main()
+
+            Case ConsoleKey.D3
+                printStories()
+                _storySelected = selectStory()
+                getContent(_titlesAndLinks(_storySelected, 1))
+        End Select
     End sub
 End Module

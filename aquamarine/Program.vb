@@ -11,6 +11,16 @@ Module Program
         Console.Clear()
         dim feedUrl as string = getFeed() ' create feed url with verification
         GetNodes(feedUrl)
+        
+        for i = 0 to _titlesAndLinks.length
+            Try
+                Console.WriteLine(_titlesAndLinks(i, 0))
+                Console.WriteLine(_titlesAndLinks(i, 1))
+            Catch
+                Exit For
+            end Try
+        Next
+        
     End sub
 
     Function GetFeed()
@@ -66,9 +76,9 @@ Module Program
 
         dim indexForPopulatingArrays = 0
         for each item in _nodeList
-                _titlesAndLinks(indexForPopulatingArrays, 0) = item.SelectSingleNode("title").InnerText
-                _titlesAndLinks(indexForPopulatingArrays, 1) = item.SelectSingleNode("link").InnerText
-                indexForPopulatingArrays += 1
+            _titlesAndLinks(indexForPopulatingArrays, 0) = item.SelectSingleNode("title").InnerText
+            _titlesAndLinks(indexForPopulatingArrays, 1) = item.SelectSingleNode("link").InnerText
+            indexForPopulatingArrays += 1
         Next
         
     End sub

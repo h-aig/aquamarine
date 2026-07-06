@@ -9,6 +9,7 @@ Module Program
     Private _nodeList as XmlNodeList
     Private _titlesAndLinks(,) ' create 2d array for storing titles/links
     Private _noStories as Integer
+    
 
     sub Main()
         Console.Clear()
@@ -19,6 +20,23 @@ Module Program
         dim storySelected as integer = selectStory()
         Console.Clear()
         getContent(_titlesAndLinks(storySelected, 1))
+        
+        dim key as ConsoleKeyInfo
+        
+        Do
+            key = Console.ReadKey(True)
+        Loop Until key.Key >= ConsoleKey.D1 AndAlso key.Key <= ConsoleKey.D3
+        
+        if (Key.key - 49) = 1
+            Environment.Exit(1)
+            ElseIf (key.key - 49) = 2
+                Main()
+                Else 
+                printStories()
+                selectStory()
+                getContent(_titlesAndLinks(storySelected, 1))
+        End If
+        
     End sub
 
     Function GetFeed()
@@ -36,7 +54,7 @@ Module Program
                 End Using
                 feedValid = True
             Catch
-                console.Write("Holy invalid url. try again nonce: ")
+                console.Write("Invalid url. try again: ")
                 feedValid = False
                 submittedFeed = console.Readline()
             End Try
@@ -107,8 +125,6 @@ Module Program
     End function
 
     sub getContent(link)
-        Console.BackgroundColor = ConsoleColor.black
-        Console.ForegroundColor = ConsoleColor.white
         Console.Clear()
         Console.WriteLine("Loading...")
 
@@ -193,7 +209,6 @@ Module Program
 
 
                 if shouldWriteParagraph = True ' if the paragraph isn't empty
-                    Console.ForegroundColor = ConsoleColor.DarkGray
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&amp;", "&")
                     prettyParagraphs(i) = prettyParagraphs(i).Replace("&lt;", "<") _
                     ' replace escape sequences with correct characters in each paragraph
@@ -226,5 +241,13 @@ Module Program
 
             Main() ' TODO SEE ABOVE
         End If
+        
+        Console.WriteLine()
+        Console.ForegroundColor = ConsoleColor.Yellow
+        console.WriteLine("Press 1 to quit")
+        console.Writeline("Press 2 to go to feed selection")
+        console.Write("Press 3 to go to story selection")
+        Console.ResetColor()
+        
     End sub
 End Module

@@ -37,3 +37,6 @@ Literally just some http queries, traversing the feed's xml document to extract 
 <img width="3670" height="1916" alt="image" src="https://github.com/user-attachments/assets/9f89d759-3988-4e00-a55c-e6704ee13dbc" />
 <img width="3670" height="1916" alt="image" src="https://github.com/user-attachments/assets/216452ca-3e8b-470b-b1e6-191289bdd29c" />
 <img width="3670" height="1916" alt="image" src="https://github.com/user-attachments/assets/bd26cf4b-f937-4d5c-9ab2-94eef446daf6" />
+
+# AI Use
+I think I used it to help me understand a way to accept a certain range of input keys (eg. just 1-9 and not any key) but nothing much apart from that really.

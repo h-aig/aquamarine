@@ -73,7 +73,10 @@ Module Program
             _titlesAndLinks(i, 1) = link.InnerText
         Next ' grab all titles and links
         
-        
+        for i as integer = 0 to itemsInNodeList
+            Console.WriteLine(_titlesAndLinks(i, 0))
+            Console.WriteLine(_titlesAndLinks(i, 1))
+        Next
         
     End sub 
     

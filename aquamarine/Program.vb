@@ -6,6 +6,7 @@ Imports System.Xml
 Module Program
     Private _nodeList as XmlNodeList
     Private _titlesAndLinks(,) ' create 2d array for storing titles/links
+    Private _noStories as Integer
 
     sub Main()
         Console.Clear()
@@ -78,11 +79,10 @@ Module Program
     sub printStories()
         Console.Clear()
 
-        dim i as Integer
-        for i = 0 to _titlesAndLinks.length
-            if i < 10
+        for _noStories = 0 to _titlesAndLinks.length
+            if _noStories < 10
                 Try
-                    Console.Writeline(_titlesAndLinks(i, 0))
+                    Console.Writeline(_titlesAndLinks(_noStories, 0))
                 Catch
                     Exit For
                 end Try
@@ -96,10 +96,15 @@ Module Program
     sub selectStory()
         dim key as ConsoleKeyInfo
         
-        do until Key.Key >= ConsoleKey.D1 AndAlso Key.Key <= ConsoleKey.D9  
-            key = console.ReadKey(True)
-        loop
+'        do until Key.Key >= ConsoleKey.D1 AndAlso Key.Key <= ConsoleKey.D9  
+'            key = console.ReadKey(True)
+'        loop
         
+        Do
+            key = Console.ReadKey(True)
+        Loop Until key.Key >= ConsoleKey.D1 AndAlso key.Key <= CType(ConsoleKey.D0 + _noStories, ConsoleKey)
+        
+        Console.WriteLine("hahaha")
         
     End sub
     

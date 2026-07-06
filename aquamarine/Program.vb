@@ -12,6 +12,8 @@ Module Program
         dim feedUrl as string = getFeed() ' create feed url with verification
         GetNodes(feedUrl)
         printStories()
+        selectStory()
+        
     End sub
 
     Function GetFeed()
@@ -91,4 +93,14 @@ Module Program
         Console.Write("Select a story using the keys on your keyboard (1-9)")
         
     End sub
+    sub selectStory()
+        dim key as ConsoleKeyInfo
+        
+        do until Key.Key >= ConsoleKey.D1 AndAlso Key.Key <= ConsoleKey.D9  
+            key = console.ReadKey(True)
+        loop
+        
+        
+    End sub
+    
 End Module

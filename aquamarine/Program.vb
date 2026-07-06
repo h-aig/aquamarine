@@ -27,8 +27,11 @@ Module Program
         dim client as new WebClient
         client.Headers("User-Agent") = "Mozilla/4.0"
 
-        Console.Write("Link to feed: ")
+        Console.Write("Link to feed (IF YOU DON'T KNOW WHAT AN RSS FEED JUST PRESS ENTER, A SAMPLE THE VERGE FEED WILL BE PROVIDED): ")
         dim submittedFeed as string = console.ReadLine()
+        if submittedFeed = "" 
+            submittedFeed = "https://www.theverge.com/rss/partner/subscriber-only-full-feed/rss.xml"
+        End If
         dim feedValid as Boolean
         dim synFeed as SyndicationFeed
 

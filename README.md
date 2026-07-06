@@ -3,7 +3,7 @@
 # READ RSS FEEDS IN THE TERMINAL!
 - Torture yourself! You must upload the feed you want to read from every time!
 - What a stupid suggestion! We don't take OPML files!
-- Feeds do not persist! We don't save them anywhere! Very good for privacy! (/s like the rest)
+- Feeds do not persist! We don't save them anywhere! Very good for privacy!
 
 We do everything else though (read; you can read your feeds, but we don't do images!)
 

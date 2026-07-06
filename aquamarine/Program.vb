@@ -12,7 +12,6 @@ Module Program
         dim feedUrl as string = getFeed() ' create feed url with verification
         GetNodes(feedUrl)
         printStories()
-        
     End sub
 
     Function GetFeed()
@@ -72,19 +71,24 @@ Module Program
             _titlesAndLinks(indexForPopulatingArrays, 1) = item.SelectSingleNode("link").InnerText
             indexForPopulatingArrays += 1
         Next
-        
     End sub
-    
+
     sub printStories()
         Console.Clear()
-        
+
+        dim i as Integer
         for i = 0 to _titlesAndLinks.length
-            Try
-                Console.WriteLine(_titlesAndLinks(i, 0))
-            Catch
-                Exit For
-            end Try
+            if i < 10
+                Try
+                    Console.Writeline(_titlesAndLinks(i, 0))
+                Catch
+                    Exit For
+                end Try
+            End If
         Next
+        
+        Console.WriteLine()
+        Console.Write("Select a story using the keys on your keyboard (1-9)")
         
     End sub
 End Module

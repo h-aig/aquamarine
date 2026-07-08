@@ -89,7 +89,7 @@ Module Program
         Console.Clear()
 
         for _noStories = 0 to _titlesAndLinks.length
-            if _noStories < 10
+            if _noStories < 9
                 Try
                     Console.Writeline(_titlesAndLinks(_noStories, 0))
                 Catch
